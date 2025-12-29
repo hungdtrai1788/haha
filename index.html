@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title> Gửi Vittt đầnnn</title>
+
+<style>
+    .flap-text{
+    position:absolute;
+    top:20px;
+    width:100%;
+    text-align:center;
+    font-size:16px;
+    font-weight:600;
+    color:#ff4b5c;
+    pointer-events:none; /* không cản click */
+}
+
+body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 80px;
+    background:linear-gradient(135deg,#ffdde1,#ee9ca7);
+    font-family:'Segoe UI',sans-serif;
+    overflow:hidden;
+}
+
+/* ================= KHÓA ================= */
+.lock-screen{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.75);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+}
+.lock-box{
+    background:#fff;
+    padding:35px;
+    border-radius:20px;
+    width:360px;
+    text-align:center;
+}
+.lock-box h2{color:#ff4b5c}
+
+.mirror-text{
+    transform:scaleX(-1);
+    font-size:14px;
+    color:#777;
+    font-style:italic;
+    margin:8px 0;
+}
+
+.attempts{font-size:14px;color:#555}
+
+.pin{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    margin:15px 0;
+}
+.pin input{
+    width:60px;
+    height:60px;
+    font-size:26px;
+    text-align:center;
+    border-radius:14px;
+    border:2px solid #ddd;
+}
+
+.lock-box button{
+    padding:12px 30px;
+    border:none;
+    border-radius:12px;
+    background:#ff4b5c;
+    color:#fff;
+    font-size:16px;
+    cursor:pointer;
+}
+.error{color:red;display:none}
+.timer{color:#ff4b5c;font-weight:bold}
+
+/* ================= BÁNH KEM ================= */
+.cake{
+    font-size:300px;
+    opacity:0;
+    transform:translateX(-200px) scale(0.5);
+    transition:1s;
+}
+.cake.show{
+    opacity:1;
+    transform:translateX(0) scale(1);
+}
+
+/* ================= PHONG BÌ ================= */
+.envelope{
+    width:560px;
+    height:360px;
+    position:relative;
+    perspective:1200px;
+    cursor:pointer;
+    pointer-events:none;
+}
+.envelope.unlocked{pointer-events:auto}
+
+.back{
+    position:absolute;
+    inset:0;
+    background:#fff;
+    border-radius:26px;
+    box-shadow:0 25px 50px rgba(0,0,0,.35);
+}
+
+.flap{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:180px;
+    background:#ffe3ea;
+    border-radius:26px 26px 0 0;
+    clip-path:polygon(0 0,100% 0,50% 100%);
+    transform-origin:top;
+    transition:1s;
+}
+
+.heart{
+    position:absolute;
+    top:45px;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:48px;
+}
+
+.paper{
+    position:absolute;
+    width:90%;
+    height:280px;
+    background:#fff;
+    top:60px;
+    left:5%;
+    border-radius:20px;
+    box-shadow:0 15px 35px rgba(0,0,0,.3);
+    padding:30px;
+    text-align:center;
+    opacity:0;
+    transform:translateY(130px);
+    transition:1s;
+}
+
+.envelope.open .flap{transform:rotateX(135deg)}
+.envelope.open .paper{
+    opacity:1;
+    transform:translateY(-70px);
+}
+
+/* ================= PHÁO HOA ================= */
+canvas{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+}
+</style>
+</head>
+
+<body>
+
+<!-- KHÓA -->
+<div class="lock-screen" id="lockScreen">
+    <div class="lock-box" id="lockBox">
+        <h2>🔐 NHẬP MÃ PIN</h2>
+        <div class="mirror-text">
+            2 số đầu ngày sinh của tôi và bạn
+        </div>
+        <div class="attempts" id="attempts">Còn 5 lần thử</div>
+
+        <div class="pin">
+            <input maxlength="1">
+            <input maxlength="1">
+            <input maxlength="1">
+            <input maxlength="1">
+        </div>
+
+        <button onclick="unlock()">Mở khóa</button>
+        <div class="error" id="error">❌ Sai mã PIN</div>
+        <div class="timer" id="timer"></div>
+    </div>
+</div>
+
+<!-- NHẠC -->
+<audio id="song">
+    <source src="khuc-hat-mung-sinh-nhat.mp3" type="audio/mpeg">
+</audio>
+
+<button onclick="document.getElementById('song').play()">
+▶ TEST NHẠC
+</button>
+
+
+
+
+<canvas id="fireworks"></canvas>
+
+<div class="cake" id="cake">🎂</div>
+
+<div class="envelope" id="envelope">
+    <div class="back"></div>
+    <div class="flap">
+    <div class="flap-text">k biết ấn vô à</div>
+    <div class="heart">❤️</div>
+</div>
+
+
+    <div class="paper">
+        <h1>🎉 CHÚC MỪNG SINH NHẬT 🎂</h1>
+        <p>
+            T chúc m lun lun vui vẻ ngày càng xinh đẹp học giỏi hơn 😄<br>
+            Ngày càng yêu bản thân và những người xung quanh hơn 💪<br>
+            Chúc m tuổi mới mọi thứ tốt đẹp sẽ đến với m ( dả dụ như t chẳng hạn)✨
+        </p>
+        <b>— hăm cần biếc âuuuu 😎 —</b>
+    </div>
+</div>
+
+<script>
+/* ========== PIN ========== */
+const PIN="1729"; // đổi tại đây
+let tries=5, locked=false;
+
+const inputs=document.querySelectorAll(".pin input");
+inputs.forEach((i,idx)=>{
+    i.oninput=()=>idx<3 && i.value && inputs[idx+1].focus();
+});
+
+function unlock(){
+    if(locked) return;
+    let v=""; inputs.forEach(i=>v+=i.value);
+
+    if(v===PIN){
+        document.getElementById("lockScreen").style.display="none";
+        envelope.classList.add("unlocked");
+        return;
+    }
+
+    tries--;
+    document.getElementById("attempts").innerText=`Còn ${tries} lần thử`;
+    document.getElementById("error").style.display="block";
+    inputs.forEach(i=>i.value="");
+
+    if(tries<=0){
+        document.getElementById("lockBox").innerHTML="<h2>🚫 ĐÃ KHÓA</h2>";
+        return;
+    }
+    cooldown();
+}
+
+function cooldown(){
+    locked=true;
+    let t=30;
+    const timer=document.getElementById("timer");
+    timer.innerText=`⏳ Chờ ${t}s`;
+    const i=setInterval(()=>{
+        t--;
+        timer.innerText=`⏳ Chờ ${t}s`;
+        if(t<=0){
+            clearInterval(i);
+            timer.innerText="";
+            locked=false;
+        }
+    },1000);
+}
+
+/* ========== THƯ + NHẠC ========== */
+const envelope=document.getElementById("envelope");
+const cake=document.getElementById("cake");
+const song=document.getElementById("song");
+
+let fireworksPlayed=false;
+
+envelope.onclick=()=>{
+    envelope.classList.toggle("open");
+
+    if(envelope.classList.contains("open")){
+        cake.classList.add("show");
+        song.play();
+
+        if(!fireworksPlayed){
+            startFireworks();
+            fireworksPlayed=true;
+        }
+    }else{
+        cake.classList.remove("show");
+        song.pause();
+        song.currentTime=0;
+    }
+};
+
+/* ========== PHÁO HOA ========== */
+const canvas=document.getElementById("fireworks");
+const ctx=canvas.getContext("2d");
+canvas.width=innerWidth;
+canvas.height=innerHeight;
+
+const colors=["#ff4b5c","#ffd93d","#6bcfef","#7cff01","#c77dff","#ff9ff3"];
+let parts=[];
+
+function startFireworks(){
+    const f=setInterval(createFirework,300);
+    setTimeout(()=>clearInterval(f),20000);
+}
+function createFirework(){
+    const x=Math.random()*canvas.width;
+    const y=Math.random()*canvas.height*0.4;
+    const c=colors[Math.floor(Math.random()*colors.length)];
+    for(let i=0;i<80;i++)
+        parts.push({x,y,vx:(Math.random()-.5)*8,vy:(Math.random()-.5)*8,life:80,color:c});
+}
+(function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    parts.forEach((p,i)=>{
+        p.x+=p.vx; p.y+=p.vy; p.life--;
+        ctx.fillStyle=p.color;
+        ctx.fillRect(p.x,p.y,3,3);
+        if(p.life<=0) parts.splice(i,1);
+    });
+    requestAnimationFrame(animate);
+})();
+</script>
+
+</body>
+</html>
